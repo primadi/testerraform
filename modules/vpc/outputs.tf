@@ -7,3 +7,8 @@ output "igw_id" {
   value       = aws_internet_gateway.def_igw.id
   description = "VPC Internet Gateway"
 }
+
+output "vpc_cidr" {
+  value       = var.vpc_cidr
+  description = "VPC CIDR"
+}

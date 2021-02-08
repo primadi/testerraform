@@ -25,8 +25,3 @@ variable "ami_id" {
 variable "instance_type" {
   description = "AMI Instance Type"
 }
-
-variable "ebs_size" {
-  description = "Additional EBS Vol Size"
-  type        = number
-}

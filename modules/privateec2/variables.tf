@@ -14,10 +14,6 @@ variable "availability_zone" {
   description = "Availibility Zone of Created EC2"
 }
 
-variable "publicsubnet_id" {
-  description = "ID of public subnet"
-}
-
 variable "ami_id" {
   description = "AMI ID"
 }
@@ -29,4 +25,17 @@ variable "instance_type" {
 variable "ebs_size" {
   description = "Additional EBS Vol Size"
   type        = number
+}
+
+variable "connect_bastion" {
+  description = "Connect to bastion or not"
+  type        = bool
+}
+
+variable "bastion_ip" {
+  description = "Bastion IP Address"
+}
+
+variable "privatesubnet_id" {
+  description = "ID of private subnet"
 }

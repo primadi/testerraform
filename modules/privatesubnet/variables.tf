@@ -14,20 +14,25 @@ variable "subnet_cidr" {
   description = "Subnet CIDR Block"
 }
 
-variable "publicsubnet_id" {
-  description = "ID of public subnet to access internet"
+variable "use_nat_instance" {
+  description = "Flag to use Nat Instance or not"
+  default     = false
 }
 
-variable "use_nats_instance" {
-  description = "if true, this subnet use nats instance to access internet"
-  type        = bool
+variable "use_nat_gateway" {
+  description = "Flag to use Nat Gateway or not"
+  default     = false
 }
 
-variable "nat_instance_type" {
-  description = "NAT Instance Type"
+variable "nat_gateway_routetable_id" {
+  description = "NAT Gateway route table id"
 }
 
-variable "use_nats_gateway" {
-  description = "if true, this subnet use nats gateway to access internet"
-  type        = bool
+variable "nat_instance_routetable_id" {
+  description = "NAT Instance route table id"
+}
+
+variable "nat_instance_securitygroup_id" {
+  description = "NAT Instance Security Group ID - Use only if using nat instance"
+  default     = ""
 }

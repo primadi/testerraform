@@ -10,7 +10,6 @@ variable "availability_zone" {
   description = "Subnet Availibility Zone"
 }
 
-
 variable "subnet_cidr" {
   description = "Subnet CIDR Block"
   default     = "192.168.0.0/24"
