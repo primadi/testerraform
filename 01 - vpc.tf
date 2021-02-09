@@ -9,6 +9,12 @@ data "aws_availability_zones" "available" {
   state = "available"
 }
 
+variable "use_nat_gateway" {
+  description = "if true: use nat gateway to access internet, else: use nat instance"
+  type        = bool
+}
+
 locals {
-  az = data.aws_availability_zones.available.names[0]
+  az               = data.aws_availability_zones.available.names[0]
+  use_nat_instance = !var.use_nat_gateway
 }

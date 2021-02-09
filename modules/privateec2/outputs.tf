@@ -5,3 +5,7 @@ output "ec2_id" {
 output "security_group_id" {
   value = aws_security_group.ec2.id
 }
+
+output "private_ip" {
+  value = aws_instance.ec2.private_ip
+}

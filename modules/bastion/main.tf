@@ -45,6 +45,10 @@ resource "aws_instance" "bastion" {
   vpc_security_group_ids = [aws_security_group.bastion.id]
   subnet_id              = var.publicsubnet_id
 
+  root_block_device {
+    volume_type = "gp3"
+  }
+
   lifecycle {
     ignore_changes = [associate_public_ip_address]
   }

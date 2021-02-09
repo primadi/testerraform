@@ -6,8 +6,3 @@ variable "vpc_cidr" {
 variable "name" {
   description = "VPC Name"
 }
-
-variable "enable_dns" {
-  description = "Enable DNS Hostname and Support"
-  default     = false
-}

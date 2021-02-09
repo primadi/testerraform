@@ -48,6 +48,10 @@ resource "aws_instance" "nat_i" {
   associate_public_ip_address = false
   vpc_security_group_ids      = [aws_security_group.nat_i[0].id]
 
+  root_block_device {
+    volume_type = "gp3"
+  }
+
   lifecycle {
     ignore_changes = [associate_public_ip_address]
   }
@@ -67,14 +71,11 @@ resource "aws_eip" "nat_i" {
   }
 }
 
+# Internet Gateway has Route Table
+# Route Table has Route
 resource "aws_route_table" "nat_i" {
   count  = var.use_nat_instance ? 1 : 0
   vpc_id = var.vpc_id
-
-  route {
-    cidr_block  = "0.0.0.0/0"
-    instance_id = aws_instance.nat_i[0].id
-  }
 
   tags = {
     Name = var.name
@@ -83,5 +84,13 @@ resource "aws_route_table" "nat_i" {
   lifecycle {
     create_before_destroy = true
   }
+}
 
+# Route Represent Single Route of Route Table
+# Must be separated from Route Table
+resource "aws_route" "nat_i" {
+  count                  = var.use_nat_instance ? 1 : 0
+  route_table_id         = aws_route_table.nat_i[0].id
+  instance_id            = aws_instance.nat_i[0].id
+  destination_cidr_block = "0.0.0.0/0"
 }

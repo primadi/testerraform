@@ -13,6 +13,10 @@ module "ec2_postgres" {
   bastion_ip        = module.ec2_bastion.bastion_ip
 }
 
+output "ec2_postgress_ip" {
+  value = module.ec2_postgres.private_ip
+}
+
 resource "aws_security_group_rule" "postgres_access" {
   type              = "ingress"
   from_port         = 7654

@@ -15,6 +15,6 @@ variable "subnet_cidr" {
   default     = "192.168.0.0/24"
 }
 
-variable "igw_id" {
-  description = "Internet Gateway"
+variable "igw_routetable_id" {
+  description = "Internet Gateway RouteTable ID"
 }

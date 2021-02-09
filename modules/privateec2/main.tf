@@ -47,15 +47,19 @@ resource "aws_instance" "ec2" {
   vpc_security_group_ids = [aws_security_group.ec2.id]
   subnet_id              = var.privatesubnet_id
 
+  root_block_device {
+    volume_type = "gp3"
+  }
+
   tags = {
     Name = var.name
   }
 }
 
 resource "aws_ebs_volume" "ec2" {
-  count             = var.ebs_size > 0 ? 1 : 9
+  count             = var.ebs_size > 0 ? 1 : 0
   availability_zone = var.availability_zone
-  type              = "gp2"
+  type              = "gp3"
   size              = var.ebs_size
 
   tags = {
@@ -64,7 +68,7 @@ resource "aws_ebs_volume" "ec2" {
 }
 
 resource "aws_volume_attachment" "ec2" {
-  count       = var.ebs_size > 0 ? 1 : 9
+  count       = var.ebs_size > 0 ? 1 : 0
   device_name = "/dev/sdh"
   volume_id   = aws_ebs_volume.ec2[0].id
   instance_id = aws_instance.ec2.id
