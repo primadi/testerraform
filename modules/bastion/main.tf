@@ -6,6 +6,14 @@ resource "aws_security_group" "bastion" {
   }
 
   lifecycle {
+    # create before destroy is needed, because attached security group cannot deleted
+    # if terraform need to modify security group, terraform must do :
+    # 1. Create new security group
+    # 2. change attached instance to new security group
+    # 3. delete old security group
+    #
+    # security group detail must define separated from security group,
+    # reason: it is more easy for terraform to add/ delete rule if needed
     create_before_destroy = true
   }
 }
@@ -46,10 +54,13 @@ resource "aws_instance" "bastion" {
   subnet_id              = var.publicsubnet_id
 
   root_block_device {
+    # gp3 is more cheaper than gp2 :
+    # https://cloudwiry.com/ebs-gp3-vs-gp2-pricing-comparison/
     volume_type = "gp3"
   }
 
   lifecycle {
+    # no need to update terraform if public ip address change
     ignore_changes = [associate_public_ip_address]
   }
 
@@ -58,9 +69,23 @@ resource "aws_instance" "bastion" {
   }
 }
 
+data "aws_eip" "bastion" {
+  filter {
+    name   = "tag:Name"
+    values = [var.public_ip_name]
+  }
+}
+
+resource "aws_eip_association" "bastion" {
+  count         = var.public_ip_name == "" ? 0 : 1
+  instance_id   = aws_instance.bastion.id
+  allocation_id = data.aws_eip.bastion.id
+}
+
 resource "aws_eip" "bastion" {
+  count    = var.public_ip_name == "" ? 1 : 0
   vpc      = true
-  instance = aws_instance.bastion.id
+  instance = aws_instance.ec2.id
 
   tags = {
     Name = var.name

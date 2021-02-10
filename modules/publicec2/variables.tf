@@ -26,7 +26,12 @@ variable "instance_type" {
   description = "AMI Instance Type"
 }
 
-variable "ebs_size" {
-  description = "Additional EBS Vol Size"
-  type        = number
+variable "ebs_vol_name" {
+  description = "EBS Volume Name"
+  type        = string
+}
+
+variable "public_ip_name" {
+  description = "Name of Public IP, If Empty Auto Generate"
+  type        = string
 }

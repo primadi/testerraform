@@ -1,7 +1,7 @@
 module "privatesubnet" {
   source = "./modules/privatesubnet"
 
-  name              = "arov2_private"
+  name              = "private_subnet"
   vpc_id            = module.vpc.vpc_id
   subnet_cidr       = "192.168.1.0/24"
   availability_zone = local.az

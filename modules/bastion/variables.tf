@@ -25,3 +25,8 @@ variable "ami_id" {
 variable "instance_type" {
   description = "AMI Instance Type"
 }
+
+variable "public_ip_name" {
+  description = "Name of Public IP, If Empty Auto Generate"
+  type        = string
+}

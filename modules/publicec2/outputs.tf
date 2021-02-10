@@ -3,7 +3,7 @@ output "ec2_id" {
 }
 
 output "public_ip" {
-  value = aws_eip.ec2.public_ip
+  value = var.public_ip_name == "" ? aws_eip.ec2[0].public_ip : aws_eip_association.ec2[0].public_ip
 }
 
 output "security_group_id" {

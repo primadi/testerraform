@@ -16,6 +16,9 @@ resource "aws_internet_gateway" "igw" {
 }
 
 resource "aws_default_route_table" "igw" {
+  # this is default route table for VPC, cannot created or deleted
+  # this is special resources, terraform not create it,
+  # but referring to default route table in VPC
   default_route_table_id = aws_vpc.vpc.default_route_table_id
   tags = {
     Name = var.name

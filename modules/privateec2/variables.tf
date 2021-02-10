@@ -22,9 +22,9 @@ variable "instance_type" {
   description = "AMI Instance Type"
 }
 
-variable "ebs_size" {
-  description = "Additional EBS Vol Size"
-  type        = number
+variable "ebs_vol_name" {
+  description = "EBS Volume Name"
+  type        = string
 }
 
 variable "connect_bastion" {

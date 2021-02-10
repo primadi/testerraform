@@ -25,6 +25,14 @@ resource "aws_route_table" "nat_gw" {
   }
 
   lifecycle {
+    # create before destroy is needed, because associated route table cannot deleted
+    # if terraform need to modify security group, terraform must do :
+    # 1. Create new route table
+    # 2. change associated instance to new route table
+    # 3. delete old route table
+    #
+    # route  detail must define separated from route table,
+    # reason: it is more easy for terraform to add/ delete route if needed
     create_before_destroy = true
   }
 }

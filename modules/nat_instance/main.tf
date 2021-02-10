@@ -1,4 +1,5 @@
 data "aws_ami" "nat_i" {
+  # find most recent AMI from Amazon for NAT Instance
   most_recent = true
 
   filter {
@@ -15,6 +16,18 @@ resource "aws_security_group" "nat_i" {
 
   tags = {
     Name = var.name
+  }
+
+  lifecycle {
+    # create before destroy is needed, because attached security group cannot deleted
+    # if terraform need to modify security group, terraform must do :
+    # 1. Create new security group
+    # 2. change attached instance to new security group
+    # 3. delete old security group
+    #
+    # security group detail must define separated from security group,
+    # reason: it is more easy for terraform to add/ delete rule if needed
+    create_before_destroy = true
   }
 }
 
@@ -38,21 +51,35 @@ resource "aws_security_group_rule" "ping" {
   security_group_id = aws_security_group.nat_i[0].id
 }
 
+resource "aws_security_group_rule" "ssh_access" {
+  count             = var.use_nat_instance ? 1 : 0
+  type              = "ingress"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.nat_i[0].id
+}
+
 resource "aws_instance" "nat_i" {
   count                       = var.use_nat_instance ? 1 : 0
   ami                         = data.aws_ami.nat_i.id
   availability_zone           = var.availability_zone
   instance_type               = var.nat_instance_type
+  key_name                    = var.key_name
   source_dest_check           = false
   subnet_id                   = var.publicsubnet_id
   associate_public_ip_address = false
   vpc_security_group_ids      = [aws_security_group.nat_i[0].id]
 
   root_block_device {
+    # gp3 is more cheaper than gp2 :
+    # https://cloudwiry.com/ebs-gp3-vs-gp2-pricing-comparison/
     volume_type = "gp3"
   }
 
   lifecycle {
+    # no need to update terraform if public ip address change
     ignore_changes = [associate_public_ip_address]
   }
 
@@ -61,8 +88,21 @@ resource "aws_instance" "nat_i" {
   }
 }
 
+data "aws_eip" "nat_i" {
+  filter {
+    name   = "tag:Name"
+    values = [var.public_ip_name]
+  }
+}
+
+resource "aws_eip_association" "nat_i" {
+  count         = var.public_ip_name == "" ? 0 : 1
+  instance_id   = aws_instance.nat_i[0].id
+  allocation_id = data.aws_eip.nat_i.id
+}
+
 resource "aws_eip" "nat_i" {
-  count    = var.use_nat_instance ? 1 : 0
+  count    = var.public_ip_name == "" ? 1 : 0
   vpc      = true
   instance = aws_instance.nat_i[0].id
 
@@ -82,6 +122,14 @@ resource "aws_route_table" "nat_i" {
   }
 
   lifecycle {
+    # create before destroy is needed, because associated route table cannot deleted
+    # if terraform need to modify security group, terraform must do :
+    # 1. Create new route table
+    # 2. change associated instance to new route table
+    # 3. delete old route table
+    #
+    # route  detail must define separated from route table,
+    # reason: it is more easy for terraform to add/ delete route if needed
     create_before_destroy = true
   }
 }
